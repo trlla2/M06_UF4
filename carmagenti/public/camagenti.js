@@ -6,7 +6,9 @@ let player1;
 let player2;
 
 
-const socket = new WebSocket("ws://10.40.2.186:8080");
+//const socket = new WebSocket("ws://10.40.2.186:8080"); //Classe
+const socket = new WebSocket("ws://192.168.1.149:8080"); //Casa
+
 
 socket.addEventListener("open", function(event){
 });
@@ -86,9 +88,10 @@ function preload(){
 }
 
 function create(){
-    let bg = this.add.image(config.width/2, config.height/2, "Background-img");
+    let bg = this.add.image(1000, 1000, "Background-img");
 
-    player1 = this.add.image(config.width/3, config.height/2,"Player1-img");
+    player1 = this.add.image(1000, 1000,"Player1-img");
+
     player2 = this.add.image((config.width/3) * 2,config.height/2,"Player2-img");
 
     bullet1 = this.add.image(config.width/2, config.height/2, "Bullet-img");
@@ -97,6 +100,10 @@ function create(){
 
     //KEYS
     cursors = this.input.keyboard.createCursorKeys();
+
+    //COLIDERS
+
+    //this.physics.add.collider(player1, player2);
 }
 
 function update(){
