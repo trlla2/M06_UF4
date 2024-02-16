@@ -6,15 +6,15 @@ let player1;
 let player2;
 
 
-//const socket = new WebSocket("ws://10.40.2.186:8080"); //Classe
-const socket = new WebSocket("ws://192.168.1.149:8080"); //Casa
+const socket = new WebSocket("ws://10.40.2.186:8080"); //Classe
+//const socket = new WebSocket("ws://192.168.1.149:8080"); //Casa
 
 
 socket.addEventListener("open", function(event){
 });
 
 socket.addEventListener("message",function(event){
-    console.log("Server: ", event.data);
+    //console.log("Server: ", event.data);
 
     let data = JSON.parse(event.data);
 
@@ -49,6 +49,12 @@ const config = {
     type: Phaser.AUTO,
 	width: 800,
 	height: 600,
+    physics:{
+		default:'arcade',
+		arcade:{
+			debug: true
+		}
+	},
     scene:{
         preload: preload,
         create: create,
@@ -78,6 +84,9 @@ let bullet2_speed = 10;
 let bullet2_angle = 0;
 let bullet2_isShooted = false;
 
+let getHit = false; 
+
+let global_game;
 
 
 function preload(){
@@ -88,22 +97,45 @@ function preload(){
 }
 
 function create(){
-    let bg = this.add.image(1000, 1000, "Background-img");
+    global_game = this;
 
-    player1 = this.add.image(1000, 1000,"Player1-img");
+    let bg = this.add.image(config.width/2, config.height/2, "Background-img");
+
+    player1 = this.add.image(config.width/3, config.height/2, "Player1-img");
 
     player2 = this.add.image((config.width/3) * 2,config.height/2,"Player2-img");
 
-    bullet1 = this.add.image(config.width/2, config.height/2, "Bullet-img");
-    bullet2 = this.add.image(config.width/2, config.height/2, "Bullet-img");
+    bullet1 = this.add.image(1000, 1000, "Bullet-img");
+    bullet2 = this.add.image(1000, 1000, "Bullet-img");
 
 
     //KEYS
     cursors = this.input.keyboard.createCursorKeys();
 
     //COLIDERS
+    if(player_num == 1){
+        this.physics.add.existing(bullet2, false);
+         this.physics.add.collider(bullet2, player1, function(bullet2, player1){
+            console.log("player 2 win");
+            //global_game.add.text(config.width/2, config.height/2, 'Static Text Object', { fontFamily: 'Arial', fontSize: 64, color: '#00ff00' });
 
-    //this.physics.add.collider(player1, player2);
+            let getHit = true; 
+        });
+        this.physics.add.existing(player1, false);
+
+        
+    }
+    else if(player_num == 2){
+        this.physics.add.existing(bullet1, false);
+        this.physics.add.collider(bullet1, player2, function(bullet2, player1){
+                console.log("player 1 win");
+
+            let getHit = true; 
+        });
+        this.physics.add.existing(player2, false); 
+    }
+    
+    
 }
 
 function update(){
@@ -151,7 +183,9 @@ function update(){
 
             bx: bullet1.x,
             by: bullet1.y,
-            br: bullet1.rotation
+            br: bullet1.rotation,
+
+            gh: getHit
         };
     }
     else if(player_num == 2){
@@ -186,7 +220,9 @@ function update(){
 
             bx: bullet2.x,
             by: bullet2.y,
-            br: bullet2.rotation
+            br: bullet2.rotation,
+
+            gh: getHit
         };
     }
 

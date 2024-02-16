@@ -32,7 +32,9 @@ ws_server.on('connection', function (conn){
             if(p2_conn == undefined){
                 return;
             }
-
+            if(data.gh == true){
+                console.log("gooood");
+            }
             p2_conn.send(data.toString());
         });
     }
@@ -44,6 +46,9 @@ ws_server.on('connection', function (conn){
         p2_conn.on('message', function(data){
             if(p1_conn == undefined){
                 return;
+            }
+            if(data.gh == true){
+                console.log("gooood");
             }
             p1_conn.send(data.toString());
         });
