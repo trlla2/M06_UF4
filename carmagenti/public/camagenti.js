@@ -43,7 +43,7 @@ socket.addEventListener("message",function(event){
             bullet1.y = data.by;
             bullet1.rotation = data.br;
         }
-        else{
+        else if(player_num > 2){
             if(data.pn == 1){
                 player1.x = data.x;
                 player1.y = data.y;
@@ -67,31 +67,40 @@ socket.addEventListener("message",function(event){
         
         
     }
-
-    
-    if(data.gameOver != undefined ){
+    else if(data.gameOver != undefined ){
         console.log("Win player: " + data.gameOver);
         if(player_num == 1){
             if(data.gameOver == 2){
+                title.fillStyle = '#ff0000';
+
                 title.setText("You Win");
             }
             else{
+                title.fillStyle = '#ff0000';
+
                 title.setText("You Lose");
             }
         }
         else if(player_num == 2){
             if(data.gameOver == 1){
+                title.fillStyle = '#ff0000';
+
                 title.setText("You Win");
             }
             else{
+                title.fillStyle = '#ff0000';
+
                 title.setText("You Lose");
             }
         }else{
             if(data.gameOver == 1){
+                title.fillStyle = '#ff0000';
+
                 title.setText("Player 2 WINS\nPlayer 1 LOSE");
 
             }
             else{
+                title.fillStyle = '#ff0000';
                 title.setText("Player 1 WINS\nPlayer 2 LOSE");
             }
         }

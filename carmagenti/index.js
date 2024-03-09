@@ -18,8 +18,6 @@ http_server.listen(8080);
 let p1_conn;
 let p2_conn;
 
-let go = 0;
-
 let spectators = [];
 let spectators_num = 3;
 
@@ -43,13 +41,19 @@ ws_server.on('connection', function (conn){
                 p1_conn.send('{"gameOver": 1}');
 				p2_conn.send('{"gameOver": 1}');
 
-                spectators.forEach(spectator =>{
-                    spectator.send('{"gameOver": 2}');
-                });
+                if(spectators.length != 0){
+                    spectators.forEach(spectator =>{
+                        spectator.send('{"gameOver": 1}');
+                    });
+                }
             }
             
             p2_conn.send(data.toString());
             
+            if(spectators.length == 0){
+                return;
+            }
+
             spectators.forEach(spectator =>{
                 spectator.send(data.toString());
             });
@@ -71,15 +75,19 @@ ws_server.on('connection', function (conn){
                 p1_conn.send('{"gameOver": 2}');
 				p2_conn.send('{"gameOver": 2}');
 
-                spectators.forEach(spectator =>{
-                    spectator.send('{"gameOver": 2}');
-                });
-
-                console.log("hit");
+                if(spectators.length != 0){
+                    spectators.forEach(spectator =>{
+                        spectator.send('{"gameOver": 2}');
+                    });
+                }
 
             }
 
             p1_conn.send(data.toString());
+
+            if(spectators.length == 0){
+                return;
+            }
             
             spectators.forEach(spectator =>{
                 spectator.send(data.toString());
