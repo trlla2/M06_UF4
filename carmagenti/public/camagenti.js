@@ -6,8 +6,8 @@ let player1;
 let player2;
 
 
-const socket = new WebSocket("ws://10.40.2.186:8080"); //Classe
-//const socket = new WebSocket("ws://192.168.1.149:8080"); //Casa
+//const socket = new WebSocket("ws://10.40.2.186:8080"); //Classe
+const socket = new WebSocket("ws://192.168.1.149:8080"); //Casa
 
 
 socket.addEventListener("open", function(event){
@@ -23,16 +23,18 @@ socket.addEventListener("message",function(event){
         console.log("Jugador numero: ", player_num);
     }
     else if (data.x != undefined){
+
         if(player_num == 1){
+            
             player2.x = data.x;
             player2.y = data.y;
             player2.rotation = data.r;
             
             bullet2.x = data.bx;
             bullet2.y = data.by;
-            bullet2.rotation = data.br;
+            bullet2.rotation = data.br; 
         }
-        if(player_num == 2){
+        else if(player_num == 2){
             player1.x = data.x;
             player1.y = data.y;
             player1.rotation = data.r;
@@ -41,7 +43,58 @@ socket.addEventListener("message",function(event){
             bullet1.y = data.by;
             bullet1.rotation = data.br;
         }
+        else{
+            if(data.pn == 1){
+                player1.x = data.x;
+                player1.y = data.y;
+                player1.rotation = data.r;
+    
+                bullet1.x = data.bx;
+                bullet1.y = data.by;
+                bullet1.rotation = data.br;
+            }
+            else if(data.pn == 2){
+                player2.x = data.x;
+                player2.y = data.y;
+                player2.rotation = data.r;
+                
+                bullet2.x = data.bx;
+                bullet2.y = data.by;
+                bullet2.rotation = data.br; 
+            }
+        }
+
         
+        
+    }
+
+    
+    if(data.gameOver != undefined ){
+        console.log("Win player: " + data.gameOver);
+        if(player_num == 1){
+            if(data.gameOver == 2){
+                title.setText("You Win");
+            }
+            else{
+                title.setText("You Lose");
+            }
+        }
+        else if(player_num == 2){
+            if(data.gameOver == 1){
+                title.setText("You Win");
+            }
+            else{
+                title.setText("You Lose");
+            }
+        }else{
+            if(data.gameOver == 1){
+                title.setText("Player 2 WINS\nPlayer 1 LOSE");
+
+            }
+            else{
+                title.setText("Player 1 WINS\nPlayer 2 LOSE");
+            }
+        }
     }
 });
 
@@ -108,6 +161,7 @@ function create(){
     bullet1 = this.add.image(1000, 1000, "Bullet-img");
     bullet2 = this.add.image(1000, 1000, "Bullet-img");
 
+    title = this.add.text(config.width/5, config.height/5, '', { fontFamily: 'Arial', fontSize: 64, color: '#ffffff' });
 
     //KEYS
     cursors = this.input.keyboard.createCursorKeys();
@@ -116,10 +170,7 @@ function create(){
     if(player_num == 1){
         this.physics.add.existing(bullet2, false);
          this.physics.add.collider(bullet2, player1, function(bullet2, player1){
-            console.log("player 2 win");
-            //global_game.add.text(config.width/2, config.height/2, 'Static Text Object', { fontFamily: 'Arial', fontSize: 64, color: '#00ff00' });
-
-            let getHit = true; 
+            getHit = true; 
         });
         this.physics.add.existing(player1, false);
 
@@ -128,9 +179,7 @@ function create(){
     else if(player_num == 2){
         this.physics.add.existing(bullet1, false);
         this.physics.add.collider(bullet1, player2, function(bullet2, player1){
-                console.log("player 1 win");
-
-            let getHit = true; 
+            getHit = true; 
         });
         this.physics.add.existing(player2, false); 
     }
@@ -140,7 +189,6 @@ function create(){
 
 function update(){
     //bullet stuff
-
     bullet1.y -= bullet1_speed*Math.cos(bullet1_angle*Math.PI/180);
     bullet1.x += bullet1_speed*Math.sin(bullet1_angle*Math.PI/180);
 
@@ -185,7 +233,10 @@ function update(){
             by: bullet1.y,
             br: bullet1.rotation,
 
-            gh: getHit
+            gh: getHit,
+
+            pn: player_num
+            
         };
     }
     else if(player_num == 2){
@@ -222,13 +273,14 @@ function update(){
             by: bullet2.y,
             br: bullet2.rotation,
 
-            gh: getHit
+            gh: getHit,
+
+            pn: player_num
         };
     }
 
     
 
-    
 
     socket.send(JSON.stringify(player_data));
 

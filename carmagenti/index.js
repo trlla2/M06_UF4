@@ -18,6 +18,10 @@ http_server.listen(8080);
 let p1_conn;
 let p2_conn;
 
+let go = 0;
+
+let spectators = [];
+let spectators_num = 3;
 
 ws_server.on('connection', function (conn){
    
@@ -32,10 +36,23 @@ ws_server.on('connection', function (conn){
             if(p2_conn == undefined){
                 return;
             }
-            if(data.gh == true){
-                console.log("gooood");
+
+            let parsed_data = JSON.parse(data.toString());
+            if(parsed_data.gh == true){
+
+                p1_conn.send('{"gameOver": 1}');
+				p2_conn.send('{"gameOver": 1}');
+
+                spectators.forEach(spectator =>{
+                    spectator.send('{"gameOver": 2}');
+                });
             }
+            
             p2_conn.send(data.toString());
+            
+            spectators.forEach(spectator =>{
+                spectator.send(data.toString());
+            });
         });
     }
     else if(p2_conn == undefined){
@@ -47,15 +64,33 @@ ws_server.on('connection', function (conn){
             if(p1_conn == undefined){
                 return;
             }
-            if(data.gh == true){
-                console.log("gooood");
+
+            let parsed_data = JSON.parse(data.toString());
+            if(parsed_data.gh == true){
+
+                p1_conn.send('{"gameOver": 2}');
+				p2_conn.send('{"gameOver": 2}');
+
+                spectators.forEach(spectator =>{
+                    spectator.send('{"gameOver": 2}');
+                });
+
+                console.log("hit");
+
             }
+
             p1_conn.send(data.toString());
+            
+            spectators.forEach(spectator =>{
+                spectator.send(data.toString());
+            });
         });
 
     }
-
-   /* conn.on('message', function(data){
-        console.log(data.toString());
-    });*/
+    else{
+        spectators.push(conn);
+        spectators[spectators.length - 1].send(`{"player_num": ${spectators_num}}`);
+        spectators_num++;
+    }
+   
 });
